@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Face recognition attendance | Final Commit sample project</title>
+  <meta name="description" content="Register students once, then mark the class present from the camera, with a blink check so a photo can't stand in for a student, or from a class photo. Only 128 numbers per face are stored. A sample project by Final Commit." />
+  <link rel="icon" href="https://finalcommitprojects.github.io/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="style.css" />
+  <script defer src="https://cloud.umami.is/script.js" data-website-id="f6b0f6cf-bb7f-4bd1-917e-acc1d8116251" data-domains="finalcommitprojects.github.io"></script>
+</head>
+<body>
+  <header class="top">
+    <p class="tag">Sample project · Computer vision</p>
+    <h1>Face recognition attendance</h1>
+    <p class="sub">Register students once, then mark the class present from the camera or a class photo.</p>
+    <p class="mode">Runs in your browser. Faces and the register stay on this device, and only 128 numbers per face are kept, never the photo.</p>
+  </header>
+
+  <main>
+    <section class="card" aria-labelledby="s1">
+      <h2 id="s1"><span class="step">1</span>Register students <span class="muted">(<span id="count">0</span>)</span></h2>
+      <div class="row">
+        <label>Name <input id="name" type="text" autocomplete="off" placeholder="e.g. Asha Rao" /></label>
+        <label class="roll">Roll no. <input id="roll" type="text" autocomplete="off" placeholder="21" /></label>
+      </div>
+      <div class="row actions">
+        <button id="reg-camera" type="button" class="primary" data-umami-event="demo-face-register-camera">Use the camera</button>
+        <label class="file ghost" data-umami-event="demo-face-register-photo">Upload photos<input id="reg-photos" type="file" accept="image/*" multiple /></label>
+      </div>
+      <p id="reg-msg" class="msg" aria-live="polite"></p>
+      <div id="reg-stage"></div>
+      <ul id="students" class="students"></ul>
+    </section>
+
+    <section class="card" aria-labelledby="s2">
+      <h2 id="s2"><span class="step">2</span>Take attendance</h2>
+      <div class="row actions">
+        <button id="att-camera" type="button" class="primary" data-umami-event="demo-face-attend-camera">Start the camera</button>
+        <label class="file ghost" data-umami-event="demo-face-attend-photo">Use a class photo<input id="att-photo" type="file" accept="image/*" /></label>
+        <button id="att-stop" type="button" class="link">Stop</button>
+      </div>
+      <label class="check"><input id="blink" type="checkbox" checked /> Ask each student to blink, so a printed photo can't be marked present</label>
+      <p id="att-msg" class="msg" aria-live="polite"></p>
+      <div id="att-stage"></div>
+    </section>
+
+    <section class="card" aria-labelledby="s3">
+      <h2 id="s3"><span class="step">3</span>Today's register</h2>
+      <p id="summary" class="hint"></p>
+      <div class="table">
+        <table>
+          <thead><tr><th>Roll</th><th>Name</th><th>Status</th><th>How</th><th><span class="sr">Correct</span></th></tr></thead>
+          <tbody id="register"></tbody>
+        </table>
+      </div>
+      <div class="row actions">
+        <button id="csv" type="button" class="ghost" data-umami-event="demo-face-csv">Download CSV</button>
+        <button id="new-session" type="button" class="link">Start a new session</button>
+      </div>
+    </section>
+
+    <div id="stage" class="stage" hidden>
+      <div class="view"><video playsinline muted></video><canvas></canvas></div>
+      <div class="bar"><span id="stage-text"></span><button id="capture" type="button" class="primary" hidden>Capture</button></div>
+    </div>
+
+    <section class="card how" aria-labelledby="s4">
+      <h2 id="s4">How it works</h2>
+      <ol>
+        <li><strong>Find faces.</strong> A small, fast detector finds faces in each camera frame. A slower, more accurate one is used for photos, where faces can be small.</li>
+        <li><strong>Describe each face.</strong> 68 landmarks line the face up, then a ResNet-style network turns it into 128 numbers. Photos of the same person give numbers that sit close together.</li>
+        <li><strong>Match.</strong> A face is a student's if its numbers are within 0.5 (Euclidean distance) of one of that student's saved samples, and clearly closer to that student than to anyone else. Otherwise it's "not registered".</li>
+        <li><strong>Check for a blink.</strong> A second model, MediaPipe Face Landmarker, scores how closed each eye is, from 0 to 1. A blink is a closure that opens again within 0.7 seconds. A printed photo never blinks.</li>
+        <li><strong>One face, one student.</strong> Registering a face that already belongs to another student is refused, so nobody can register for a friend.</li>
+      </ol>
+      <p class="hint">The full project usually adds a Python server (OpenCV and a face-recognition model, with Flask and SQLite), teacher logins, subjects and timetables, attendance percentages per student, and the report.</p>
+      <button id="wipe" type="button" class="link">Delete everything on this device</button>
+    </section>
+  </main>
+
+  <footer>
+    <p>Sample project. Face models by <a href="https://github.com/vladmandic/face-api">face-api</a> (MIT) and <a href="https://ai.google.dev/edge/mediapipe/solutions/vision/face_landmarker">MediaPipe</a> (Apache 2.0). Built by <a href="https://finalcommitprojects.github.io/?utm_source=demo&amp;utm_campaign=demo-face-attendance" data-umami-event="demo-to-site">Final Commit</a></p>
+  </footer>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
