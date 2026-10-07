@@ -58,3 +58,9 @@ footer { padding: 24px 16px 40px; font-size: .9rem; color: var(--ink-2); }
 a { color: var(--ink); }
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
 td .link { padding: 0; font-size: .85rem; white-space: nowrap; }
+@media (max-width: 520px) {
+  th:nth-child(4) { display: none; }
+  td.how { display: none; }
+  td small.how-sm { display: block; }
+}
+td small.how-sm { display: none; color: var(--ink-2); font-size: .8rem; }
